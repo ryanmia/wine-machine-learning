@@ -1,0 +1,13 @@
+clear all;close all;clc;
+
+red = readtable('winequality-red.csv', 'HeaderLines',1);
+
+white = readtable('winequality-white.csv', 'HeaderLines',1);
+
+%conditioning
+normalize_data(red);
+normalize_data(white);
+
+%add red versus w
+feature_extraction(red);
+feature_extraction(white);
