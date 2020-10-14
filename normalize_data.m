@@ -3,7 +3,7 @@ function res=normalize_data(data)
     res=[];
     for i=1:size(data,2)
         col=data(:,i);
-        col=normalize(col,'range');
+        col=normalize(col);
         res=[res col];
     end
 end
