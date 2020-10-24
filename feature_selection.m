@@ -79,7 +79,6 @@ for feature_i = 1:numFeatures
             gaussianWeightingFactor = numSamplesInClusterK/totalWhiteSamples;
             gaussianWhite(i, :) = gaussianWeightingFactor .* 1/(sigma*sqrt(2*pi)) .* exp(-((xWhite-mu).^2 / (2*sigma^2)));
             temp = gaussianWhite(i, :);
-            tempSum = sum(temp);
             plot(xWhite, gaussianWhite(i, :)); hold on;
         end
         title('White Wine Clustered Gaussian Distributions')
@@ -94,6 +93,48 @@ for feature_i = 1:numFeatures
         title('Gaussian Mixture Model')
         legend('Red Wine', 'White Wine');
         sgtitle(cell2mat(tableNames(feature_i)));
+        
+        % Compute pd and pfa for each feature
+        totalSamp = max([length(xRed) length(xWhite)]);
+        pd = zeros(totalSamp,1);
+        pfa = zeros(totalSamp, 1);
+        
+        % Pad zeros for calculation
+        if length(gaussianMixtureModelRed) > length(gaussianMixtureModelWhite)
+            gaussianMixtureModelWhite = [ gaussianMixtureModelWhite zeros(1, length(gaussianMixtureModelRed) - length(gaussianMixtureModelWhite)) ];
+        else
+            gaussianMixtureModelRed = [ gaussianMixtureModelRed zeros(1, length(gaussianMixtureModelWhite) - length(gaussianMixtureModelRed)) ];
+        end
+        
+        for i = 1:totalSamp
+            pfa(i) = sum(gaussianMixtureModelRed(1:i))/((sum(gaussianMixtureModelWhite) + sum(gaussianMixtureModelRed))/2);
+            pd(i) = 1 - (sum(gaussianMixtureModelWhite(1:i))/((sum(gaussianMixtureModelWhite) + sum(gaussianMixtureModelRed))/2));
+        end
+        
+        figure
+        if length(xRed) > length(xWhite)
+            plot(xRed,pd)
+        else
+
+            plot(xWhite,pd)      
+        end
+        title(['Probability of True Positive of ' cell2mat(tableNames(feature_i))])
+        
+        figure
+        if length(xRed) > length(xWhite)
+
+           plot(xRed, 1 - pd)
+        else
+           plot(xWhite,1 - pd)      
+        end
+        title(['Probability of False Alarm of ' cell2mat(tableNames(feature_i))])
+        
+        figure
+        plot(pfa,pd)
+        title(['ROC of ' cell2mat(tableNames(feature_i))])
+        xlabel('Pfa')
+        ylabel('Pd')
+        
     end
 end
 res= 1;
