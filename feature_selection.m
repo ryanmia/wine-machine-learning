@@ -96,8 +96,10 @@ for feature_i = 1:numFeatures
         
         % Compute pd and pfa for each feature
         totalSamp = max([length(xRed) length(xWhite)]);
-        pd = zeros(totalSamp,1);
-        pfa = zeros(totalSamp, 1);
+        pdWhite = zeros(totalSamp,1);
+        pfaWhite = zeros(totalSamp, 1);
+        pdRed = zeros(totalSamp,1);
+        pfaRed = zeros(totalSamp, 1);
         
         % Pad zeros for calculation
         if length(gaussianMixtureModelRed) > length(gaussianMixtureModelWhite)
@@ -107,33 +109,51 @@ for feature_i = 1:numFeatures
         end
         
         for i = 1:totalSamp
-            pfa(i) = sum(gaussianMixtureModelRed(1:i))/((sum(gaussianMixtureModelWhite) + sum(gaussianMixtureModelRed))/2);
-            pd(i) = 1 - (sum(gaussianMixtureModelWhite(1:i))/((sum(gaussianMixtureModelWhite) + sum(gaussianMixtureModelRed))/2));
+            pfaWhite(i) = sum(gaussianMixtureModelRed(1:i))/((sum(gaussianMixtureModelWhite) + sum(gaussianMixtureModelRed))/2);
+            pdWhite(i) = 1 - (sum(gaussianMixtureModelWhite(1:i))/((sum(gaussianMixtureModelWhite) + sum(gaussianMixtureModelRed))/2));
+            pfaRed(i) = sum(gaussianMixtureModelWhite(1:i))/((sum(gaussianMixtureModelWhite) + sum(gaussianMixtureModelRed))/2);
+            pdRed(i) = 1 - (sum(gaussianMixtureModelRed(1:i))/((sum(gaussianMixtureModelWhite) + sum(gaussianMixtureModelRed))/2));
         end
         
         figure
+        subplot(1,3,1)
         if length(xRed) > length(xWhite)
-            plot(xRed,pd)
+            plot(xRed,pdRed)
+            hold on
+            plot(xRed, pdWhite)
         else
-
-            plot(xWhite,pd)      
+            plot(xWhite,pdRed)      
+            hold on
+            plot(xWhite, pdWhite)
         end
-        title(['Probability of True Positive of ' cell2mat(tableNames(feature_i))])
+        title(['Probability of Detection of ' cell2mat(tableNames(feature_i))])
+        legend('Red Wine', 'White Wine');
+        ylim([0 1])
         
-        figure
+        subplot(1,3,2)
         if length(xRed) > length(xWhite)
-
-           plot(xRed, 1 - pd)
+           plot(xRed, 1 - pdRed)
+           hold on
+           plot(xRed, 1 - pdWhite)
         else
-           plot(xWhite,1 - pd)      
+           plot(xWhite,1 - pdRed)      
+           hold on
+           plot(xWhite,1 - pdWhite) 
         end
         title(['Probability of False Alarm of ' cell2mat(tableNames(feature_i))])
+        legend('Red Wine', 'White Wine');
+        ylim([0 1])
         
-        figure
-        plot(pfa,pd)
+        subplot(1,3,3)
+        plot(pfaRed,pdRed)
+        hold on;
+        plot(pfaWhite, pdWhite)
         title(['ROC of ' cell2mat(tableNames(feature_i))])
+        legend('Red Wine', 'White Wine');
         xlabel('Pfa')
         ylabel('Pd')
+        ylim([0 1])
+        xlim([0 1])
         
     end
 end
