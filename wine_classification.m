@@ -47,7 +47,7 @@ correct_rate_knn=get_correct_rate(predicted,label_test)
 data_train=data_train([1, 2, 4, 5, 6, 7, 10],:);
 data_test=data_test([1, 2, 4, 5, 6, 7, 10],:);
 predicted=knn(5,data_test,data_train,label_train);
-correct_rate_knn=get_correct_rate(predicted,label_test)
+correct_rate_knn_lessfeatures=get_correct_rate(predicted,label_test)
 
 
 %%svm,bayesion modeling, cross-validation, yadda yadda
