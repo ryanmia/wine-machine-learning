@@ -44,10 +44,12 @@ correct_rate_knn=get_correct_rate(predicted,label_test)
 
 %fixed acidity, volatile acidity, residual sugars, chlorides, free sulfur dioxide, total sulfur dioxide, and sulphates
 %2,5,7,10
-data_train=data_train([1, 2, 4, 5, 6, 7, 10],:);
-data_test=data_test([1, 2, 4, 5, 6, 7, 10],:);
-predicted=knn(5,data_test,data_train,label_train);
-correct_rate_knn_lessfeatures=get_correct_rate(predicted,label_test)
-
+data_train_sub=data_train([1, 2, 4, 5, 6, 7, 10],:);
+data_test_sub=data_test([1, 2, 4, 5, 6, 7, 10],:);
+predicted=knn(5,data_test_sub,data_train_sub,label_train);
+correct_rate_knn_lessfeatures=get_correct_rate(predicted,label_test);
 
 %%svm,bayesion modeling, cross-validation, yadda yadda
+logistic_regression_model=learn_logistic_regression_model(data_train,label_train);
+predicted_from_logreg=apply_logistic_regression_model(logistic_regression_model,label_test);
+logistic_regression_correct_rate=get_correct_rate(predicted,label_test)
