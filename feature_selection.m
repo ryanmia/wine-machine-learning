@@ -101,59 +101,66 @@ for feature_i = 1:numFeatures
         pdRed = zeros(totalSamp,1);
         pfaRed = zeros(totalSamp, 1);
         
+        
         % Pad zeros for calculation
         if length(gaussianMixtureModelRed) > length(gaussianMixtureModelWhite)
             gaussianMixtureModelWhite = [ gaussianMixtureModelWhite zeros(1, length(gaussianMixtureModelRed) - length(gaussianMixtureModelWhite)) ];
         else
-            gaussianMixtureModelRed = [ gaussianMixtureModelRed zeros(1, length(gaussianMixtureModelWhite) - length(gaussianMixtureModelRed)) ];
+           gaussianMixtureModelRed = [ gaussianMixtureModelRed zeros(1, length(gaussianMixtureModelWhite) - length(gaussianMixtureModelRed)) ];
         end
         
+        % Sweep decision points for white
         for i = 1:totalSamp
-            pfaWhite(i) = sum(gaussianMixtureModelRed(1:i))/((sum(gaussianMixtureModelWhite) + sum(gaussianMixtureModelRed))/2);
-            pdWhite(i) = 1 - (sum(gaussianMixtureModelWhite(1:i))/((sum(gaussianMixtureModelWhite) + sum(gaussianMixtureModelRed))/2));
-            pfaRed(i) = sum(gaussianMixtureModelWhite(1:i))/((sum(gaussianMixtureModelWhite) + sum(gaussianMixtureModelRed))/2);
-            pdRed(i) = 1 - (sum(gaussianMixtureModelRed(1:i))/((sum(gaussianMixtureModelWhite) + sum(gaussianMixtureModelRed))/2));
+            %sumWhite = sum(gaussianMixtureModelWhite(1:i));
+            %sumRed = sum(gaussianMixtureModelRed(1:i));
+            
+            % Assume White is decision
+            %pdWhite(i) = sumWhite / totalSumWhite;
+            %pdRed(i) = sumRed / totalSumRed;
+            
+            pfaWhite(i) = trapz(gaussianMixtureModelWhite(1:i))/sum(gaussianMixtureModelWhite);
+            
+            % Assume Red is decision
+            pfaRed(i) = trapz(gaussianMixtureModelRed(1:i))/sum(gaussianMixtureModelRed);
+            
+            % Try this out
+            
+            
         end
         
         figure
-        subplot(1,3,1)
+        subplot(1,2,1)
         if length(xRed) > length(xWhite)
-            plot(xRed,pdRed)
+            plot(xRed,1 - pfaWhite)
             hold on
-            plot(xRed, pdWhite)
+            plot(xRed, 1 - pfaRed)
         else
-            plot(xWhite,pdRed)      
+            plot(xWhite,1 - pfaWhite)      
             hold on
-            plot(xWhite, pdWhite)
+            plot(xWhite, 1 - pfaRed)
         end
         title(['Probability of Detection of ' cell2mat(tableNames(feature_i))])
         legend('Red Wine', 'White Wine');
         ylim([0 1])
+        xlabel(cell2mat(tableNames(feature_i)))
+        ylabel('Pd')
         
-        subplot(1,3,2)
+        subplot(1,2,2)
         if length(xRed) > length(xWhite)
-           plot(xRed, 1 - pdRed)
+           plot(xRed, pfaRed)
            hold on
-           plot(xRed, 1 - pdWhite)
+           plot(xRed, pfaWhite)
         else
-           plot(xWhite,1 - pdRed)      
+           plot(xWhite, pfaRed)      
            hold on
-           plot(xWhite,1 - pdWhite) 
+           plot(xWhite, pfaWhite) 
         end
         title(['Probability of False Alarm of ' cell2mat(tableNames(feature_i))])
         legend('Red Wine', 'White Wine');
         ylim([0 1])
+        xlabel(cell2mat(tableNames(feature_i)))
+        ylabel('Pfa')
         
-        subplot(1,3,3)
-        plot(pfaRed,pdRed)
-        hold on;
-        plot(pfaWhite, pdWhite)
-        title(['ROC of ' cell2mat(tableNames(feature_i))])
-        legend('Red Wine', 'White Wine');
-        xlabel('Pfa')
-        ylabel('Pd')
-        ylim([0 1])
-        xlim([0 1])
         
     end
 end
